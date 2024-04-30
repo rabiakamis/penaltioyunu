@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Penaltı Atma Oyunu</title>
+<style>
+    body {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        background-color: #f0f0f0;
+    }
+    
+    h1 {
+        text-align: center;
+        color: #139a35;
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    #saha {
+    position: relative;
+    border-radius: 10px;
+    width: 600px;
+    height: 300px;
+    background: url('football.jpg') no-repeat center center; /* Arka plan fotoğrafı ekleme */
+    background-size: cover; /* Arka planın ekran boyutuna sığacak şekilde ayarlama */
+    overflow: hidden;
+    border: 5px solid black; /* Sadece sağ kenarlık */
+}
+
+    #ball {
+        position: absolute;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        background-color: white;
+        display: none;
+    }
+    
+    #kaleci {
+        position: absolute;
+        width: 20px;
+        top: 50%;
+        left: 550px;
+        transform: translateY(-50%);
+        height: 90px;
+        background-color: #ffffff;
+    }
+
+    /* Mobil uyumlu stil */
+    @media only screen and (max-width: 600px) {
+        #saha {
+            width: 90%;
+            height: auto;
+            max-width: 90vw;
+            max-height: 90vh; /* Değişen satır */
+        }
+
+        #kaleci {
+            left: calc(90% - 10px); /* Kaleciyi sahanın sonuna yerleştir */
+        }
+    }
+</style>
+</head>
+<body>
+<h1>OYUN BAŞLASIN</h1>
+<div id="saha">
+    <div id="kaleci"></div>
+    <div id="ball"></div>
+</div>
+
+<script>
+    const kaleci = document.getElementById("kaleci");
+    const saha = document.getElementById("saha");
+    const ball = document.getElementById("ball");
+
+    let ballXekseninde = 50; // Topun başlangıç x pozisyonu
+    let ballYekseninde = 150; // Topun başlangıç y pozisyonu
+    const ballHizi = 10; // Topun hızı
+    let kaleciYekseninde = 50; // Kalecinin başlangıç y pozisyonu
+    let kaleciYonu = 1; // Kalecinin hareket yönü
+    const kaleciHizi = 90; // Kalecinin hareket hızı
+    const kaleciInterval = 1000; // Kalecinin hareket etme aralığı (milisaniye cinsinden)
+    let oyun = false; // Oyunun başlangıç durumu
+
+
+
+    function topVur(hedef) {
+        oyun = true; // Oyunun başladığını belirtiriz
+         ball.style.display = "block"; // Topu her durumda görünür hale getiririz
+        topunHareketi(hedef); // Hedefe doğru topun hareketini başlatırız
+    }
+
+
+    function topunHareketi(hedef) {
+    // Topun sahanın sonuna ulaşma kontrolü
+     if (ballXekseninde >= 550) { //top X ekseninde yani sahanın sonuna ulaşıp ulaşmadığını kontrol ediyor.
+        if (ballYekseninde >= kaleciYekseninde && ballYekseninde <= kaleciYekseninde + 90) { 
+           // topun y eksenindeki konumunun kalecinin yüksekliği içinde olup olmadığını kontrol eder. 
+            alert("Kaleci topu kurtardı!"); //Kalecinin üst kenarı ile alt kenarı arasındaysa bu uyarıyı verir.
+        }
+        else {
+            alert("Gol! Tebrikler!"); //kalecinin y eksenindeki konumunun içinde değilse bu uyarı verilir.
+        }
+        oyunuSifirla(); // gol ya da kaleci topu kurtarırsa oyun tekrarlanır.
+        return;
+    }
+
+    // Topun x ekseninde ilerlemesi
+    ballXekseninde += ballHizi; //Topun x konumu yukarıda verilen değer kadar arttırılır, böylece top sağa doğru hareket eder.
+    ball.style.left = ballXekseninde + "px"; //topun konumu güncellenir.
+
+    // Oyun devam ediyorsa bir sonraki çerçeve iste
+        if (oyun) {
+          requestAnimationFrame(() => topunHareketi(hedef));
+     }
+    }
+
+    function kaleciHareketi() {
+        setInterval(() => {
+            if (kaleciYekseninde <= 20 || kaleciYekseninde >= 180) { //kalecinin y eksenindeki konumu 20 px'den küçük veya 180 px'den büyükse kalecinin hareket yönünü değiştirir.
+                kaleciYonu *= -1;
+            }
+            kaleciYekseninde += kaleciYonu * kaleciHizi; //yön ve hızı çarparak kalecinin mevcut konumunu güncelleriz.
+            kaleci.style.top = kaleciYekseninde + "px";
+        }, kaleciInterval); //kalecinin hareket etme hızını belirler.
+    }
+
+    function oyunuSifirla() {
+        oyun = false; //oyunun durduğu anlamına gelir.
+        ball.style.display = "none"; //top görünmez.
+        ballXekseninde = 50; // topun başlangıç konumudur.
+        ballYekseninde = 150; // topun başlangıç konumu.
+        ball.style.left = ballXekseninde + "px"; //topun x ve y eksenindeki konumlarını belirler. Top bir konumda görünür.
+        ball.style.top = ballYekseninde + "px";
+        kaleciYekseninde = 50; //başlangıç konumudur.
+        kaleci.style.top = kaleciYekseninde + "px"; // kalecinin y eksenindeki konumunu günceller.
+    }
+
+    saha.addEventListener("mousedown", function(event) {
+        if (!oyun) { // Oyun devam etmiyorsa devam et.
+            let hedef = event.clientY - saha.getBoundingClientRect().top;// tıklamanın y eksenindeki konumunu verir diğeri de tıklamanın saha içindeki y eksenindeki konumu için kullanılır
+            topVur(hedef); //Topun vurulması işlevini çağırır ve tıklamanın hedefini gönderir.
+        }
+    });
+
+    kaleciHareketi(); // Kaleciyi başlat
+</script>
+
+</body>
+</html>
