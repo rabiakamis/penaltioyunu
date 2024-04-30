@@ -4,6 +4,7 @@ Penaltı Atma Oyunu, kullanıcının kaleye penaltı atma yeteneğini test etmek
 ## Oyun Ekranları && Oyun Ekran Görüntüleri
 
 ![Uygulama Ekran Görüntüsü]([(https://github.com/rabiakamis/penaltioyunu/issues/1#issue-2271056105)])
+
 #Projeyi Nasıl Çalıştıracağınız
 İndirdikten sonra, proje dizinine gidin ve index.html dosyasını bir web tarayıcısında açın.
 
